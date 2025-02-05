@@ -20,8 +20,8 @@
         <section class="input-section">
             <h2 class="section-title">Digite o nome dos seus amigos</h2>
             <div class="input-wrapper">
-                <input type="text" id="amigo" class="input-name" placeholder="Digite um nome" onkeydown="handleEnter(event)">
-                <button class="button-add" onclick="adicionarAmigo()">Adicionar</button>
+                <input type="text" id="amigo" class="input-name" placeholder="Digite um nome" onkeydown="handleEnter(event)" disabled>
+                <button class="button-add" onclick="adicionarAmigo()" disabled>Adicionar</button>
             </div>
 
             <ul id="listaAmigos" class="name-list" aria-labelledby="listaAmigos" role="list"></ul>
@@ -40,14 +40,9 @@
         let amigos = []; // Array para armazenar os nomes dos amigos
         let amigosSorteados = []; // Array para armazenar os nomes que já foram sorteados
         let timeoutId; // Variável para armazenar o ID do timeout
-        let sorteioEmAndamento = false; // Variável para controlar se o sorteio está em andamento
+        let sorteioIniciado = false; // Flag to track if the drawing has started
 
         function adicionarAmigo() {
-            if (sorteioEmAndamento) {
-                alert('O sorteio está em andamento. Não é possível adicionar mais nomes.');
-                return;
-            }
-
             let nomeAmigo = document.getElementById('amigo').value; // Obtém o nome digitado no campo de entrada
 
             if (nomeAmigo === '') {
@@ -78,11 +73,15 @@
         }
 
         function sortearAmigo() {
-            sorteioEmAndamento = true; // Define que o sorteio está em andamento
+            if (!sorteioIniciado) {
+                // Disable input and button
+                document.getElementById('amigo').disabled = true;
+                document.querySelector('.button-add').disabled = true;
+                sorteioIniciado = true;
+            }
 
             if (amigos.length === 0) {
                 alert('Adicione amigos à lista antes de sortear.'); // Exibe um alerta se não houver amigos na lista
-                sorteioEmAndamento = false; //Reseta a variavel
                 return; // Sai da função se não houver amigos
             }
 
@@ -93,6 +92,11 @@
                 alert('Todos os amigos foram sorteados! A lista será reiniciada.'); // Exibe um alerta se todos os amigos já foram sorteados
                 amigosSorteados = []; // Reinicia a lista de amigos sorteados
                 disponiveis = [...amigos]; // Copia todos os amigos para a próxima rodada
+
+                // Re-enable input and button
+                document.getElementById('amigo').disabled = false;
+                document.querySelector('.button-add').disabled = false;
+                sorteioIniciado = false;
             }
 
             let indiceAleatorio = Math.floor(Math.random() * disponiveis.length); // Gera um índice aleatório dentro da lista de disponíveis
@@ -113,15 +117,15 @@
             if (amigosSorteados.length === amigos.length) {
                 amigos = []; // Limpa a lista original de amigos
                 atualizarListaAmigos(); // Atualiza a lista exibida na página
-                sorteioEmAndamento = false; // Define que o sorteio não está mais em andamento
+
+                // Re-enable input and button
+                document.getElementById('amigo').disabled = false;
+                document.querySelector('.button-add').disabled = false;
+                sorteioIniciado = false;
             }
         }
 
         function handleEnter(event) {
-            if (sorteioEmAndamento){
-                return;
-            }
-
             if (event.key === "Enter") {
                 adicionarAmigo();
                 event.preventDefault(); // Prevent form submission if inside a form
