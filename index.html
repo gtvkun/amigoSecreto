@@ -40,8 +40,14 @@
         let amigos = []; // Array para armazenar os nomes dos amigos
         let amigosSorteados = []; // Array para armazenar os nomes que já foram sorteados
         let timeoutId; // Variável para armazenar o ID do timeout
+        let sorteioEmAndamento = false; // Variável para controlar se o sorteio está em andamento
 
         function adicionarAmigo() {
+            if (sorteioEmAndamento) {
+                alert('O sorteio está em andamento. Não é possível adicionar mais nomes.');
+                return;
+            }
+
             let nomeAmigo = document.getElementById('amigo').value; // Obtém o nome digitado no campo de entrada
 
             if (nomeAmigo === '') {
@@ -72,8 +78,11 @@
         }
 
         function sortearAmigo() {
+            sorteioEmAndamento = true; // Define que o sorteio está em andamento
+
             if (amigos.length === 0) {
                 alert('Adicione amigos à lista antes de sortear.'); // Exibe um alerta se não houver amigos na lista
+                sorteioEmAndamento = false; //Reseta a variavel
                 return; // Sai da função se não houver amigos
             }
 
@@ -98,16 +107,21 @@
             clearTimeout(timeoutId); // Clear any existing timeout to prevent multiple timers running
             timeoutId = setTimeout(function() {
                 document.getElementById('resultado').innerHTML = '';
-            }, 3000); // 3000 milissegundos = 3 segundos
+            }, 5000); // 5000 milissegundos = 5 segundos
 
             // Após sortear todos, reinicia a lista de amigos.
             if (amigosSorteados.length === amigos.length) {
                 amigos = []; // Limpa a lista original de amigos
                 atualizarListaAmigos(); // Atualiza a lista exibida na página
+                sorteioEmAndamento = false; // Define que o sorteio não está mais em andamento
             }
         }
 
         function handleEnter(event) {
+            if (sorteioEmAndamento){
+                return;
+            }
+
             if (event.key === "Enter") {
                 adicionarAmigo();
                 event.preventDefault(); // Prevent form submission if inside a form
