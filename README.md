@@ -73,7 +73,7 @@ Você pode acessar o projeto e testá-lo diretamente através do seguinte link:
 
 Para executar o projeto localmente:
 
-Clone o repositório: git clone https://github.com/seu-usuario/seu-repositorio.git
+Clone o repositório: git clone 
 
 Abra o arquivo index.html no seu navegador.
 
