@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale: 1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,14 +16,14 @@
             <h1 class="main-title">Amigo Secreto</h1>
             <img src="assets/amigo-secreto.png" alt="Imagem representativa de amigo secreto">
         </header>
-        
+
         <section class="input-section">
             <h2 class="section-title">Digite o nome dos seus amigos</h2>
             <div class="input-wrapper">
-                <input type="text" id="amigo" class="input-name" placeholder="Digite um nome">
+                <input type="text" id="amigo" class="input-name" placeholder="Digite um nome" onkeydown="handleEnter(event)">
                 <button class="button-add" onclick="adicionarAmigo()">Adicionar</button>
             </div>
-           
+
             <ul id="listaAmigos" class="name-list" aria-labelledby="listaAmigos" role="list"></ul>
             <ul id="resultado" class="result-list" aria-live="polite"></ul>
 
@@ -36,6 +36,83 @@
         </section>
     </main>
 
-    <script src="app.js" defer></script>
+    <script>
+        let amigos = []; // Array para armazenar os nomes dos amigos
+        let amigosSorteados = []; // Array para armazenar os nomes que já foram sorteados
+        let timeoutId; // Variável para armazenar o ID do timeout
+
+        function adicionarAmigo() {
+            let nomeAmigo = document.getElementById('amigo').value; // Obtém o nome digitado no campo de entrada
+
+            if (nomeAmigo === '') {
+                alert('Por favor, insira um nome.'); // Exibe um alerta se o campo estiver vazio
+                return; // Sai da função se o campo estiver vazio
+            }
+
+            if (amigos.includes(nomeAmigo)) {
+                alert('Este nome já foi adicionado. Por favor, digite nome e sobrenome.'); // Exibe um alerta se o nome já existe na lista
+                return; // Sai da função se o nome já existe
+            }
+
+            amigos.push(nomeAmigo); // Adiciona o nome ao array de amigos
+            document.getElementById('amigo').value = ''; // Limpa o campo de entrada
+
+            atualizarListaAmigos(); // Atualiza a lista de amigos exibida na página
+        }
+
+        function atualizarListaAmigos() {
+            let listaAmigosElement = document.getElementById('listaAmigos'); // Obtém o elemento da lista (<ul>)
+            listaAmigosElement.innerHTML = ''; // Limpa a lista existente
+
+            for (let i = 0; i < amigos.length; i++) {
+                let listItem = document.createElement('li'); // Cria um novo elemento <li>
+                listItem.textContent = amigos[i]; // Define o texto do <li> como o nome do amigo
+                listaAmigosElement.appendChild(listItem); // Adiciona o <li> à lista (<ul>)
+            }
+        }
+
+        function sortearAmigo() {
+            if (amigos.length === 0) {
+                alert('Adicione amigos à lista antes de sortear.'); // Exibe um alerta se não houver amigos na lista
+                return; // Sai da função se não houver amigos
+            }
+
+            // Cria uma lista de nomes que ainda não foram sorteados
+            let disponiveis = amigos.filter(amigo => !amigosSorteados.includes(amigo));
+
+            if (disponiveis.length === 0) {
+                alert('Todos os amigos foram sorteados! A lista será reiniciada.'); // Exibe um alerta se todos os amigos já foram sorteados
+                amigosSorteados = []; // Reinicia a lista de amigos sorteados
+                disponiveis = [...amigos]; // Copia todos os amigos para a próxima rodada
+            }
+
+            let indiceAleatorio = Math.floor(Math.random() * disponiveis.length); // Gera um índice aleatório dentro da lista de disponíveis
+            let amigoSorteado = disponiveis[indiceAleatorio]; // Obtém o nome do amigo sorteado usando o índice aleatório
+
+            // Exibe o nome do amigo sorteado na página
+            document.getElementById('resultado').innerHTML = `<li style="color: green;">Amigo sorteado: ${amigoSorteado}</li>`;
+
+            amigosSorteados.push(amigoSorteado); // Adiciona o nome sorteado à lista de amigos já sorteados
+
+            // Limpa o nome após 5 segundos
+            clearTimeout(timeoutId); // Clear any existing timeout to prevent multiple timers running
+            timeoutId = setTimeout(function() {
+                document.getElementById('resultado').innerHTML = '';
+            }, 3000); // 3000 milissegundos = 3 segundos
+
+            // Após sortear todos, reinicia a lista de amigos.
+            if (amigosSorteados.length === amigos.length) {
+                amigos = []; // Limpa a lista original de amigos
+                atualizarListaAmigos(); // Atualiza a lista exibida na página
+            }
+        }
+
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                adicionarAmigo();
+                event.preventDefault(); // Prevent form submission if inside a form
+            }
+        }
+    </script>
 </body>
 </html>
