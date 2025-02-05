@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale: 1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap"
+        rel="stylesheet">
     <title>Amigo Secreto</title>
 </head>
 
@@ -20,8 +22,9 @@
         <section class="input-section">
             <h2 class="section-title">Digite o nome dos seus amigos</h2>
             <div class="input-wrapper">
-                <input type="text" id="amigo" class="input-name" placeholder="Digite um nome" onkeydown="handleEnter(event)" disabled>
-                <button class="button-add" onclick="adicionarAmigo()" disabled>Adicionar</button>
+                <input type="text" id="amigo" class="input-name" placeholder="Digite um nome"
+                    onkeydown="handleEnter(event)">
+                <button class="button-add" onclick="adicionarAmigo()">Adicionar</button>
             </div>
 
             <ul id="listaAmigos" class="name-list" aria-labelledby="listaAmigos" role="list"></ul>
@@ -55,6 +58,11 @@
                 return; // Sai da função se o nome já existe
             }
 
+            if(sorteioIniciado){
+                alert('Sorteio em andamento. Aguarde o término para adicionar mais amigos.');
+                return;
+            }
+
             amigos.push(nomeAmigo); // Adiciona o nome ao array de amigos
             document.getElementById('amigo').value = ''; // Limpa o campo de entrada
 
@@ -81,7 +89,12 @@
             }
 
             if (amigos.length === 0) {
+                 // Re-enable input and button
+                 document.getElementById('amigo').disabled = false;
+                document.querySelector('.button-add').disabled = false;
+                sorteioIniciado = false;
                 alert('Adicione amigos à lista antes de sortear.'); // Exibe um alerta se não houver amigos na lista
+
                 return; // Sai da função se não houver amigos
             }
 
@@ -89,14 +102,17 @@
             let disponiveis = amigos.filter(amigo => !amigosSorteados.includes(amigo));
 
             if (disponiveis.length === 0) {
-                alert('Todos os amigos foram sorteados! A lista será reiniciada.'); // Exibe um alerta se todos os amigos já foram sorteados
-                amigosSorteados = []; // Reinicia a lista de amigos sorteados
-                disponiveis = [...amigos]; // Copia todos os amigos para a próxima rodada
-
                 // Re-enable input and button
+
                 document.getElementById('amigo').disabled = false;
                 document.querySelector('.button-add').disabled = false;
                 sorteioIniciado = false;
+                alert('Todos os amigos foram sorteados! A lista será reiniciada.'); // Exibe um alerta se todos os amigos já foram sorteados
+                amigosSorteados = []; // Reinicia a lista de amigos sorteados
+                disponiveis = [...amigos]; // Copia todos os amigos para a próxima rodada
+                amigos = [];//limpa o array original
+                atualizarListaAmigos();//atualiza a lista de amigos
+
             }
 
             let indiceAleatorio = Math.floor(Math.random() * disponiveis.length); // Gera um índice aleatório dentro da lista de disponíveis
@@ -109,19 +125,21 @@
 
             // Limpa o nome após 5 segundos
             clearTimeout(timeoutId); // Clear any existing timeout to prevent multiple timers running
-            timeoutId = setTimeout(function() {
+            timeoutId = setTimeout(function () {
                 document.getElementById('resultado').innerHTML = '';
             }, 5000); // 5000 milissegundos = 5 segundos
 
             // Após sortear todos, reinicia a lista de amigos.
             if (amigosSorteados.length === amigos.length) {
-                amigos = []; // Limpa a lista original de amigos
-                atualizarListaAmigos(); // Atualiza a lista exibida na página
-
                 // Re-enable input and button
+
                 document.getElementById('amigo').disabled = false;
                 document.querySelector('.button-add').disabled = false;
                 sorteioIniciado = false;
+
+                amigos = [];//limpa o array original
+                amigosSorteados = [];//Limpa o array de sorteados
+                atualizarListaAmigos();//atualiza a lista de amigos
             }
         }
 
@@ -133,4 +151,5 @@
         }
     </script>
 </body>
+
 </html>
